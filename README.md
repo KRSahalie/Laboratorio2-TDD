@@ -43,7 +43,7 @@ Agregar si ameita.
 #### 5. Testbench
 El siguiente fragmento de código muestra una simplificación del test bench con la finalidad de poder visualizar su esctructura global y funcionamiento.
 
-### 3.2 Ejercicio 3- Decodificador hex-to-7-segments
+
 # Ejercicio 3: Decodificador hex-to-7-segments
 
 La solución al ejercicio 3 consiste en el uso de un decodificador binario a hexadecimal y su conversión a la visualización equivalente en siete segmentos (creado en el Laboratorio 1), pero que en lugar de utilizar switches para mapear datos, utiliza datos pseudoaleatorios. Esta implementación se realiza mediante la integración de cuatro Registros de Desplazamiento de Retroalimentación Lineal (LFSR) de 4 bits, concatenados en una unidad de entrada paralela-paralela (PIPO) de 16 bits. El objetivo principal es convertir secuencias binarias generadas por los LFSR en su representación hexadecimal y, a su vez, visualizar estas cifras en dispositivos de siete segmentos. 
