@@ -145,7 +145,7 @@ endmodule // LFSR_TB
 La simulación se puede ver en la imagen siguiente: 
 
 <div align="center">
-  <img src="https://github.com/EL3313/laboratorio2-grupo-6/blob/main/ejercicio3/Imagenes/TB%20LSFR.png">
+  <img src="https://github.com/KRSahalie/Laboratorio2-TDD/blob/main/Ejercicio3/Imagenes/TB%20LSFR.png">
 </div>
 
 Los valores obtenidos son correctos y esperados, se comprueba la generación de datos con este paso. 
@@ -155,7 +155,7 @@ Los valores obtenidos son correctos y esperados, se comprueba la generación de 
 Este módulo registra los datos de entrada cuando se activa la señal de escritura, y los mantiene hasta que se produce la siguiente escritura. Es un componente básico pero esencial en muchos sistemas digitales, utilizado para almacenar datos y sincronizar operaciones en circuitos digitales. Es simple, de 16 bits y toma los valores concatenados de las LFSR como entrada (se explica en módulo TOP). En el siguiente diagrama se muestra su funcionamiento, la entrada se representa con una D. 
 
 <div align="center">
-  <img src="https://github.com/EL3313/laboratorio2-grupo-6/blob/main/ejercicio3/Imagenes/imagen%202.jpg">
+  <img src="https://github.com/KRSahalie/Laboratorio2-TDD/blob/main/Ejercicio3/Imagenes/imagen%202.jpg">
 </div>
 
 ### 1. Encabezado
@@ -288,7 +288,7 @@ endmodule
 La simulación se puede ver en la imagen siguiente: 
 
 <div align="center">
-  <img src="https://github.com/EL3313/laboratorio2-grupo-6/blob/main/ejercicio3/Imagenes/TB%20LSFR.png">
+  <img src="https://github.com/KRSahalie/Laboratorio2-TDD/blob/main/Ejercicio3/Imagenes/TB%20LSFR%20Y%20PIPO.png">
 </div>
 
 Los valores obtenidos son correctos y esperados, se comprueba la generación de datos y concatenación en el registro PIPO con este paso. 
