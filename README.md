@@ -30,7 +30,9 @@ Para el diseño del antirebotres y sincronizador se procedio a crear un module d
 Se desea crear el programar el siguiente esquematico y a partir de este se cran los siguientes modulos para implementarlos en la FPGA.
 
 <div align="center">
-  <img src="https://github.com/KRSahalie/Laboratorio2-TDD/main/Imagenes/mi_ca/1.png">
+  <img src="https://raw.githubusercontent.com/KRSahalie/Laboratorio2-TDD/main/Imagenes/mi_ca/1.png">
+</div>
+
 
 #### 1. Encabezados de los  módulos
 Se implementa una funcion Top para mostrar la salida de lka tarjeta mediante la utilizacion de los leds, tambien inicializa el reloj
