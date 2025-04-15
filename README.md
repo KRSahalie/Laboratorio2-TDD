@@ -116,11 +116,9 @@ Agregar parámetros en este formato.
 Agregar en este formato.
 - `clk`, `bt1_1`, `rst_i`: Entradas de datos al modulo top debouncer.
 - `conta_o`: Salida del módulo.
-  
-#### 4. Criterios de diseño
-Agregar si ameita.
 
-#### 5. Testbench
+
+#### 4. Testbench
 Por Ultimo se implemento una testbench para poder realizar la simulacion de lo planteadop anteriormente
 
 ```
