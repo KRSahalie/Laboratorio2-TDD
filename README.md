@@ -139,7 +139,11 @@ module tb_modules_debouncer;
         CLK_10MHZ  = 0;
         cont2      = 0; 
 ```
+como resultado al implementar el testbenh obtuvimos lo siguiente
 
+<div align="center">
+  <img src="https://raw.githubusercontent.com/KRSahalie/Laboratorio2-TDD/main/Imagenes/mi_ca/resultadoTB.png">
+</div>
 
 # Ejercicio 3: Decodificador hex-to-7-segments
 
