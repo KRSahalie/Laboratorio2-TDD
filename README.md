@@ -24,24 +24,118 @@ Agregar código del módulo
 #### 3. Testbench y Implementación en la FPGA
 
 
-### 3.2 Ejercicio 2- Diseño antirebotes y sincronizador
-Descripción del módulo.
-#### 1. Encabezado del módulo
-```SystemVerilog
-Agregar código.
+# Ejercicio 2: Diseño antirebotes y sincronizador
+Para el diseño del antirebotres y sincronizador se procedio a crear un module debouncer mediante la yutilizacion de dos flip flop para eliminar los pulsos mo deseados, tambien se utilizo un contador para llevar la cuenta en de los cambion en el falco positivo de la senal habilitadora.
+
+Se desea crear el programar el siguiente esquematico y a partir de este se cran los siguientes modulos para implementarlos en la FPGA.
+
+#Agragar Imagen
+
+#### 1. Encabezados de los  módulos
+Se implementa una funcion Top para mostrar la salida de lka tarjeta mediante la utilizacion de los leds, tambien inicializa el reloj
+Encabezado del modulo
 ```
+module top_module_debouncer(
+    input     logic             clk,
+    input     logic             bt1_i,
+    input     logic             rst_i,
+    output    logic    [7:0]    conta_o                         
+    );
+  
+  logic clk_10MHz;  
+  logic en_10kHz;
+  logic signal;
+```
+
+Se crea un module_deboncer donse se realiza la conecxion de los flip flop para el sistema antirebote
+
+```
+module modules_debouncer(
+    input     logic    clk,
+    input     logic    bt1_i,
+    input     logic    rst_i,
+    output    logic    signal_o
+    );
+    
+    logic en_out;
+    logic Q1,Q1_neg, Q2, Q2_neg;
+    
+    module_FFD ff1(
+        .clk   (clk),
+        .D     (bt1_i),
+        .EN    (en_out),
+        .Q     (Q1)
+        );
+        
+    module_FFD ff2(
+        .clk   (clk),
+        .D     (Q1),
+        .EN    (en_out),
+        .Q     (Q2)
+        );
+    
+    assign Q2_neg = ~Q2;    
+    assign signal_o = Q1 & Q2_neg; 
+        
+
+    clock_enable clkEN(
+        .Clk_10M (clk),
+        .slow_clk_en (en_out) 
+    );
+    
+       
+
+endmodule 
+
+    module clock_enable(input Clk_10M,output slow_clk_en);
+    logic [26:0]counter=0;
+    always @(posedge Clk_10M)
+    begin
+       counter <= (counter>=249999)?0:counter+1;
+    end
+    assign slow_clk_en = (counter == 249999)?1'b1:1'b0; 
+endmodule
+```
+Tambien sde crea el module_contador_prueba el cual se impolementa para la llevar la cuenta en los cambios de la senal habilitadora.
+Encabezado del modulo
+```
+module module_contador_prueba(
+    input logic         clk, 
+    input logic         rst_n_i, 
+    input logic         en_i, 
+    output logic [7:0]  conta);
+```
+
 #### 2. Parámetros
 Agregar parámetros en este formato.
 - `WIDTH`: Parámetro que define el ancho del bus de datos en el multiplexor. Tiene un valor predeterminado de 8, pero en el test bench este toma valores de 4, 8 y 16.
 #### 3. Entradas y salidas
 Agregar en este formato.
-- `in_0`, `in_1`, `in_2`, `in_3`: Entradas de datos al multiplexor.
-- `sel`: Entrada de 2 bits que especifica qué entrada del multiplexor se seleccionará.
-- `out`: Salida del módulo, representa el dato seleccionado por el multiplexor según la entrada `sel`.
+- `clk`, `bt1_1`, `rst_i`: Entradas de datos al modulo top debouncer.
+- `conta_o`: Salida del módulo.
+  
 #### 4. Criterios de diseño
 Agregar si ameita.
+
 #### 5. Testbench
-El siguiente fragmento de código muestra una simplificación del test bench con la finalidad de poder visualizar su esctructura global y funcionamiento.
+Por Ultimo se implemento una testbench para poder realizar la simulacion de lo planteadop anteriormente
+
+```
+module tb_modules_debouncer;
+    logic           clk;
+    logic           bt1_i;
+    logic           rst_i;
+    logic           signal_o;
+    logic           CLK_100MHZ;
+    logic           CLK_10MHZ;
+    logic    [3:0]  cont2;
+    
+    
+    initial begin
+        CLK_100MHZ = 0;
+        CLK_10MHZ  = 0;
+        cont2      = 0; 
+```
 
 
 # Ejercicio 3: Decodificador hex-to-7-segments
