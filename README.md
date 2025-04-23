@@ -23,6 +23,7 @@ Agregar código del módulo
 #### 2. Criterios y restricciones de diseño
 #### 3. Testbench y Implementación en la FPGA
 
+# Ejercicio 1 - Uso del PLL IP-core
 
 # Ejercicio 2: Diseño antirebotes y sincronizador
 Para el diseño del antirebotres y sincronizador se procedio a crear un module debouncer mediante la yutilizacion de dos flip flop para eliminar los pulsos mo deseados, tambien se utilizo un contador para llevar la cuenta en de los cambion en el falco positivo de la senal habilitadora.
@@ -963,7 +964,7 @@ El ejercicio fue diseñado e implementado con éxito, y todas las funcionalidade
 
 
 
-### 3.4 Ejercicio 4. Banco de registros
+# Ejercicio 4. Banco de registros
 
 Agregar lo que amerite.
 #### 1.Código final Bit Adder
