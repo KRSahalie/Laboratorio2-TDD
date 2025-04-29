@@ -1068,10 +1068,475 @@ end
 endmodule
 ```
 
+# 3.5 Ejercicio 5. Mini unidad de cálculo
+## 1. Diagrama de bloques para la mini unidad de claculo
+ <div align="center">
+<img src="https://raw.githubusercontent.com/KRSahalie/Laboratorio2-TDD/main/Ejercicio5/Imagenes/Diagrama_Bloques.png">
+</div>
+## 2.1 Diagramas de de flujo para la mini unidad de calculo 
+### 2.1 Modo 1
+ <div align="center">
+<img src="https://raw.githubusercontent.com/KRSahalie/Laboratorio2-TDD/main/Ejercicio5/Imagenes/Diagrama taller.drawio.png">
+</div>
+### 2.2 Modo 2
+ <div align="center">
+<img src="https://raw.githubusercontent.com/KRSahalie/Laboratorio2-TDD/main/Ejercicio5/Imagenes/Diagrama_Flujo_M2.png">
+</div>
 
-### 3.5 Ejercicio 5. Mini unidad de cálculo
- 
-#### 1. Encabezado del módulo
-#### 2. Criterios de diseño
-#### 3. Testbench
+## 3. La maquina de estados seleccionada fue la de moore que se encuentra en la siguiente imagen.
+<div align="center">
+<img src="https://raw.githubusercontent.com/KRSahalie/Laboratorio2-TDD/main/Ejercicio5/Imagenes/FSM">
+</div>
 
+## 4. Ruta de datos
+Para el sistema primero se generan 2 grupo de bits semialeatorios (LSFR), uno a la vez pasando por el mux donde la maquina de estados permite la salida de la entrada del LSFR guardando en la dirección 1 a los primeros 7 bits semialeatorios y luego volviendo a realizar el proceso para los segundos 7bits semialeatorios. Ya guardados en el banco de registros en la posición 1 y 2 se manda los valores del registro a la ALU al mismo tiempo que se manda cada uno de los 2 numeros semialatorios a la pa
+
+## 5. Codigo
+```
+module FSM(
+input logic clk,
+input logic rst,
+input logic swt,
+input logic btn0,
+input logic btn1,
+input logic btn2,
+input logic btn3,
+
+output logic [3:0]  led,
+output logic [15:0] seg,
+output logic        mux,
+output logic        we,
+output logic [3:0]  op,
+output logic [4:0]  addr
+    );
+    
+typedef enum logic [3:0]{
+INICIO    = 4'd0,
+LSFR      = 4'd1,
+ADDRESS   = 4'd2,
+REGISTRO  = 4'd3,
+ALU       = 4'd4,
+TIEMPO    = 4'd5,
+JUMP      = 4'd6,
+ESPERA    = 4'd7,
+ALMACEN   = 4'd8,
+DISPLAY   = 4'd9,
+RETORNO   = 4'd10, 
+DIRECCION = 4'd11,
+LECTURA   = 4'd12,
+SUMA      = 4'd13
+}state_t;
+
+state_t state, next_state;
+
+logic [3:0]  jump;
+logic [15:0] count;
+logic [3:0] max;
+
+//Definición del rst y valores iniciales
+always @(negedge clk)begin
+    if (rst) begin
+         state    <= INICIO;
+         count    <= 0;
+         jump     <= 0;
+         max      <= 0;
+         addr     <= 0;
+  end else begin
+        state    <= next_state;
+//        count    <= next_count;
+//        jump     <= next_jump;
+//        max      <= next_max;
+//        addr     <= next_addr;
+    end
+end
+    
+//Definición de siguiente estado
+always_comb begin
+        next_state = state;
+        case (state)
+            //1°Modo
+            INICIO:     next_state = (swt == 0)    ? LSFR    : DIRECCION;
+            LSFR:       next_state = ADDRESS;
+            ADDRESS:    next_state = (jump >= 2)   ? REGISTRO    : LSFR;
+            REGISTRO:   next_state = ALU;
+            ALU:        next_state = (btn0 || btn1 || btn2 || btn3) ? TIEMPO: ALU;
+            TIEMPO:     next_state = (count >= 10) ? JUMP  : ALU;
+            JUMP:       next_state = (jump >= 2)   ? ESPERA  : ALU;
+            ESPERA:     next_state = ALMACEN;
+            ALMACEN:    next_state = DISPLAY;
+            DISPLAY:    next_state = (count >= 20) ? RETORNO : DISPLAY;
+            RETORNO:    next_state = (max >= 10)   ? RETORNO : INICIO;
+            //2°Modo
+            DIRECCION:  next_state = LECTURA;
+            LECTURA:    next_state = (count >= 20) ? SUMA    : LECTURA;
+            SUMA:       next_state = (max >= 32 )  ? INICIO  : LECTURA;
+        endcase
+end
+//Definición de salida de estados
+always_comb begin
+        case (state)
+        //1°Modo
+            INICIO:begin      
+                        led = 4'b0000; //0
+                        seg = 16'h0000;
+                        mux = 0;
+                        we = 0;
+                        op = 4'h0;
+                        addr = addr;
+                        jump = jump;
+                        count = count;
+                        max = max;
+                        end
+            LSFR:begin
+                        led = 4'b0001; //1
+//                        seg = 16'h0000;
+//                        mux = 0;
+//                        we = 1;
+//                        op = 4'h0;
+//                        addr = addr; 
+//                        jump = jump;
+//                        count = count;
+//                        max = max;
+                        end
+            ADDRESS:begin 
+                        led = 4'b0010;//2
+//                        seg = 16'h0000;
+//                        mux = 0;
+                        we = 1;
+//                        op = 4'h0;
+                        addr = addr + 1;
+                        jump = jump + 1 ;
+//                        count = count; 
+                        end                 
+            REGISTRO:begin   
+                        led = 4'b0011;//3 
+//                        seg = 16'h0000;
+//                        mux =  1;
+                        we = 1;
+//                        op = 4'h0;
+                        addr = addr - 2;
+                        jump = jump - 2;
+//                        count = count;
+//                        max = max;
+                        end
+            ALU:begin //4
+            mux = 1; 
+            we = 0;        
+                        if (btn0) begin
+                            op = 4'h2;
+                            led  = 4'b1001;
+//                            seg = 16'h0000;
+//                            addr = addr;
+//                            jump = jump;
+//                            count = count;
+//                            max = max;
+                            end
+                        else if (btn1) begin
+                            op = 4'h6;
+                            led  = 4'b0110;
+//                            seg = 16'h0000;
+//                            addr = addr;
+//                            jump = jump;
+//                            count = count;
+//                            max = max;
+                            end
+                        else if (btn2) begin
+                            op = 4'h0;
+                            led  = 4'b1111;
+//                            seg = 16'h0000;
+//                            addr = addr;
+//                            jump = jump;
+//                            count = count;
+//                            max = max;
+                            end
+                        else if (btn3) begin
+                            op = 4'h1;
+                            led  = 4'b1010;
+//                            seg = 16'h0000;
+//                            mux =  1;
+//                            we = 1;
+//                            addr = addr;
+//                            jump = jump;
+//                            count = count;
+//                            max = max;
+                            end
+                        end
+            TIEMPO:begin 
+                        led = 4'b0101;//5
+//                        seg = 16'h0000;
+//                        mux =  0;
+//                        we = 0;
+//                        op = 4'b0000;
+                        count = count + 20;
+//                        jump = jump;
+//                        addr = addr;
+//                        max = max;
+                        end
+            JUMP:begin 
+                        led = 4'b0110;//6
+                        seg = 16'h0000;
+//                        mux =  0;
+//                        we =0;
+//                        op = 4'b0000;
+//                        count = count;
+                        jump = jump + 1;
+                        addr = addr + 1;
+//                        max = max;
+                        end
+            ESPERA:begin      
+                        led = 4'b0111;//7
+//                        seg = 16'h0000;
+                        mux = 1;
+                        we = 1;
+//                        op = 4'b0000;
+//                        addr = addr + 1;
+                        jump = jump -1;
+                        count = count - 20;
+                        //result = result;
+//                        max = max;
+                        end
+            ALMACEN:begin
+                        led = 4'b1000;//8
+                        seg = 16'h1111;
+//                        mux =  1;
+//                        we = 1;
+//                        op = 4'b0000;
+//                        addr = addr ;
+//                        jump = jump;
+//                        count = count;
+//                        max = max;
+                        end
+            DISPLAY:begin 
+                        led = 4'b1001;//9
+                        seg = 16'h1111;
+//                        mux =  1;
+//                        we = 1;
+//                        op = 4'b0000;
+//                        addr = addr;
+//                        jump = jump;
+                        count = count + 10;
+//                        max = max;
+                        end
+            RETORNO:begin    //10
+                        led = 4'b1010;
+//                        seg = 16'h0000;
+//                        mux =  1;
+//                        we = 1;
+//                        op = 4'b0000;
+//                        addr = addr + 1;
+//                        jump = jump;
+//                        count = count;
+                        max = max + 1;
+                        end
+            //2°Modo
+            DIRECCION:begin
+                        led = 4'b1011;
+//                        seg = 16'h0000;
+                        mux =  0;
+                        we = 1;
+//                        op = 4'b0000;
+                        addr = 0;
+//                        jump = jump;
+                        count = 0;
+                        max = 0;
+                        end
+            LECTURA:begin
+                        led = 4'b1111;
+                        seg = 16'h0000;
+                        mux =  0;
+                        we = 1;
+//                        op = 4'h0;
+                        addr = addr;
+//                        jump = jump;
+                        count = count + 10;
+                        max = max;
+                        end
+            SUMA:begin  
+                        led = 4'b1001;
+                        seg = 16'h0000;
+//                        mux =  1;
+                        we = 1;
+//                        op = 4'h0;
+//                        addr = addr + 1;
+//                        jump = jump;
+                        count = count;
+                        max = max + 1;
+                        end
+        endcase
+end         
+endmodule
+```
+## 6 Top module
+```
+module FSM_top(
+input logic clk,
+input logic rst,
+input logic swt,
+input logic btn0,
+input logic btn1,
+input logic btn2,
+input logic btn3,
+
+output logic [3:0]  led,
+output logic [15:0] seg,
+output logic        mux,
+output logic        we,
+output logic [3:0]  op,
+output logic [4:0]  addr
+    );
+    
+logic [6:0] A_reg;
+//logic [6:0] B_reg;
+logic [6:0] result;
+logic [6:0] out;
+logic [6:0] rs1;
+logic [6:0] rs2;
+
+FSM fsm_U(
+.clk  (clk),
+.rst  (rst),
+.swt  (swt),
+.btn0 (btn0),
+.btn1 (btn1),
+.btn2 (btn2),
+.btn3 (btn3),
+
+.led  (led),
+.seg  (seg),
+.mux  (mux),
+.we   (we),
+.op   (op),
+.addr (addr)
+);
+
+LFSR2 l_sfm(
+.clk   (clk),
+.rst   (rst),
+.A_reg (A_reg)
+//.B_reg (B_reg)
+);
+
+mux4 mux_U(
+.in0 (A_reg), 
+.in1 (result), 
+.sel  (mux),
+.out  (out)
+);
+
+Registro reg_fsm (
+.clk(clk),
+.rst(rst),
+.addr_rs1(addr),
+.addr_rs2(addr+1),
+.addr_rd(addr+1),
+.data_in(out),
+.we(we),
+.rs1(rs1),
+.rs2(rs2)
+    );
+
+Alu Alu_U(
+.A (rs1),
+.B (rs2),
+.Alu_control (op),
+.result (result)
+);
+
+endmodule
+```
+## 7 Testbench
+
+```
+module FSM_tb;
+    // Señales de entrada
+    logic        clk;
+    logic        rst;
+    logic        swt;
+    logic        btn0, btn1, btn2, btn3;
+
+    // Señales de salida (mismos anchos que en FSM_top)
+    logic [3:0]  led;
+    logic [15:0] seg;
+    logic        mux;
+    logic        we;
+    logic [3:0]  op;
+    logic [4:0]  addr;
+
+    // Instancia de la FSM
+    FSM_top dut (
+        .clk(clk),
+        .rst(rst),
+        .swt(swt),
+        .btn0(btn0),
+        .btn1(btn1),
+        .btn2(btn2),
+        .btn3(btn3),
+        .led(led),
+        .seg(seg),
+        .mux(mux),
+        .we(we),
+        .op(op),
+        .addr(addr)
+    );
+
+    // Reloj de 10 ns
+    initial clk = 0;
+    always #5 clk = ~clk;
+
+initial begin
+$dumpfile("FSM_tb.vcd");
+$dumpvars(0, FSM_tb);
+
+        // 1) Hacer reset asíncrono
+        rst  = 1;
+        swt  = 0;
+        btn0 = 0; 
+        btn1 = 0; 
+        btn2 = 0; 
+        btn3 = 0;
+        
+        #20 
+        
+        rst = 0;              // tras dos ciclos, quitamos el reset
+       
+        // 2) Pulsamos el switch de inicio
+       #10 
+       
+        swt = 0;
+
+//        // 3) Elegimos operaciones en ALU
+//        #50 btn0 = 1; #10 btn0 = 0;
+//        #50 btn1 = 1; #10 btn1 = 0;
+//        #50 btn2 = 1; #10 btn2 = 0;
+//        #50 btn3 = 1; #10 btn3 = 0;
+
+//        // 4) Dejamos correr unos ciclos más
+//        #200;
+
+//        $display("Fin de simulación: led=%b, op=%b, addr=%0d", led, op, addr);
+//        $finish;
+//    end
+
+
+#20
+
+btn0 = 1;
+btn1 = 0;
+btn2 = 0;
+btn3 = 0;
+
+#500
+
+#20
+
+btn0 = 0;
+btn1 = 1;
+btn2 = 0;
+btn3 = 0;
+
+#500
+
+$finish;
+end
+endmodule
+```
