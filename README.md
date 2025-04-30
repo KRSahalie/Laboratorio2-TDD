@@ -18,11 +18,110 @@
 Descipción del módulo.
 #### 1. Módulo
 ```SystemVerilog
-Agregar código del módulo
+`timescale 1 ps / 1 ps
+
+module clock_0_wrapper
+   (clk_100MHz,
+    clk_100MHz_1,
+    clk_out1_0,
+    locked,
+    reset_rtl_0);
+  input clk_100MHz;
+  input clk_100MHz_1;
+  output clk_out1_0;
+  output locked;
+  input reset_rtl_0;
+
+  wire clk_100MHz;
+  wire clk_100MHz_1;
+  wire clk_out1_0;
+  wire locked;
+  wire reset_rtl_0;
+
+  clock_0 clock_0_i
+       (.clk_100MHz(clk_100MHz),
+        .clk_100MHz_1(clk_100MHz_1),
+        .clk_out1_0(clk_out1_0),
+        .locked(locked),
+        .reset_rtl_0(reset_rtl_0));
+endmodule
 ```
 #### 2. Criterios y restricciones de diseño
-#### 3. Testbench y Implementación en la FPGA
 
+#### 3. Testbench y Implementación en la FPGA
+```SystemVerilog
+`timescale 1ns / 1ps
+
+module tb_clock_0;
+
+// Declarar señales de prueba
+reg clk_100MHz;
+reg clk_100MHz_1;
+reg reset_rtl_0;  // Señal de reset
+wire clk_out1_0;  // La señal de salida de 10 MHz (generada por el PLL)
+wire locked;      // Señal de "locked" del PLL
+reg clk_10MHz_ref;  // Reloj de 10 MHz para comparación
+
+// Instanciar el wrapper
+clock_0_wrapper uut (
+    .clk_100MHz(clk_100MHz),
+    .clk_100MHz_1(clk_100MHz_1),
+    .clk_out1_0(clk_out1_0),
+    .reset_rtl_0(reset_rtl_0),
+    .locked(locked)  // Asegúrate de conectar la señal "locked"
+);
+
+// Generar el reloj de entrada de 100 MHz
+always begin
+    #5 clk_100MHz = ~clk_100MHz;  // Reloj de 100 MHz
+end
+
+// Generar el segundo reloj de entrada (si es necesario)
+always begin
+    #5 clk_100MHz_1 = ~clk_100MHz_1;  // Reloj de 100 MHz adicional, si es necesario
+end
+
+// Generar el reloj de 10 MHz para comparación
+always begin
+    #50 clk_10MHz_ref = ~clk_10MHz_ref;  // Reloj de 10 MHz (10 veces más lento que 100 MHz)
+end
+
+// Establecer las condiciones iniciales
+initial begin
+    // Inicializar señales
+    clk_100MHz = 0;
+    clk_100MHz_1 = 0;
+    clk_10MHz_ref = 0;  // Inicializar el reloj de 10 MHz
+    reset_rtl_0 = 1;  // Activar el reset al principio
+
+    // Desactivar el reset después de 10 ns
+    #10 reset_rtl_0 = 0;
+
+    // Esperar un tiempo para que el PLL se bloquee
+    #500;  // Esperar 500 ns para ver el bloqueo
+
+    // Verificar si el PLL está bloqueado
+    if (locked == 1) begin
+        $display("PLL bloqueado correctamente.");
+    end else begin
+        $display("PLL no bloqueado dentro del tiempo esperado.");
+    end
+
+    // Esperar un tiempo suficiente para observar varios ciclos de la salida de 10 MHz
+    #10000;  // Esperar un tiempo mayor (10,000 ns) para observar más ciclos de 10 MHz
+
+    // Terminar la simulación
+    $finish;
+end
+
+// Verificar señales en la simulación
+initial begin
+    $monitor("Time = %t, locked = %b, clk_out1_0 = %b, clk_10MHz_ref = %b, clk_100MHz = %b, clk_100MHz_1 = %b, reset_rtl_0 = %b", 
+              $time, locked, clk_out1_0, clk_10MHz_ref, clk_100MHz, clk_100MHz_1, reset_rtl_0);
+end
+
+endmodule
+```
 
 # Ejercicio 2: Diseño antirebotes y sincronizador
 Para el diseño del antirebotres y sincronizador se procedio a crear un module debouncer mediante la yutilizacion de dos flip flop para eliminar los pulsos mo deseados, tambien se utilizo un contador para llevar la cuenta en de los cambion en el falco positivo de la senal habilitadora.
