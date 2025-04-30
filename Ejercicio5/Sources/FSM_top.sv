@@ -34,14 +34,17 @@ output logic [15:0] seg,
 output logic        mux,
 output logic        we,
 output logic [3:0]  op,
-output logic [4:0]  addr
+output logic [4:0]  addr,
+output logic        en
     );
     
 logic [6:0] A_reg;
+//logic [6:0] B_reg;
 logic [6:0] result;
 logic [6:0] out;
 logic [6:0] rs1;
 logic [6:0] rs2;
+logic [6:0] data_in;
 
 FSM fsm_U(
 .clk  (clk),
@@ -60,26 +63,39 @@ FSM fsm_U(
 .addr (addr)
 );
 
-LFSR l_fsm(
+LFSR2 l_sfm(
 .clk   (clk),
 .rst   (rst),
 .A_reg (A_reg)
+//.B_reg (B_reg)
 );
+
+//LFSR l_sfm(
+//.i_Clk (clk),
+//.i_Rst (rst),
+//.i_Enable (en),
+ 
+//   // Optional Seed Value
+////.i_Seed_Data ,
+ 
+//.o_LFSR_Data (A_reg)
+////.o_LFSR_Done
+//);
 
 mux4 mux_U(
 .in0 (A_reg), 
 .in1 (result), 
 .sel  (mux),
-.out  (out)
+.out  (data_in)
 );
 
 Registro reg_fsm (
 .clk(clk),
 .rst(rst),
 .addr_rs1(addr),
-.addr_rs2(addr),
+.addr_rs2(addr+1),
 .addr_rd(addr),
-.data_in(out),
+.data_in(data_in),
 .we(we),
 .rs1(rs1),
 .rs2(rs2)

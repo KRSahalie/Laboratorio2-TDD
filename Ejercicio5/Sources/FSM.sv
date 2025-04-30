@@ -34,7 +34,9 @@ output logic [15:0] seg,
 output logic        mux,
 output logic        we,
 output logic [3:0]  op,
-output logic [4:0]  addr
+output logic [4:0]  addr_rs2,
+output logic [4:0]  addr,
+//output logic        en
     );
     
 typedef enum logic [3:0]{
@@ -58,37 +60,41 @@ state_t state, next_state;
 
 logic [3:0]  jump;
 logic [15:0] count;
-//logic [7:0]  result;
 logic [3:0] max;
+
 //Definición del rst y valores iniciales
-always @(posedge clk)begin
+always @(negedge clk)begin
     if (rst) begin
-        state <= INICIO;
-        addr <= 0;
-        count <= 0;
-        jump <= 0;
-        //result <= 0;
-        max <= 0;
-        end
-    else 
-        state <= next_state;
+         state    <= INICIO;
+         count    <= 0;
+         jump     <= 0;
+         max      <= 0;
+         addr     <= 0;
+  end else begin
+        state    <= next_state;
+//        count    <= next_count;
+//        jump     <= next_jump;
+//        max      <= next_max;
+//        addr     <= next_addr;
     end
+end
+    
 //Definición de siguiente estado
 always_comb begin
         next_state = state;
         case (state)
             //1°Modo
-            INICIO:     next_state = swt           ? LSFR    : DIRECCION;
+            INICIO:     next_state = (swt == 0)    ? LSFR    : DIRECCION;
             LSFR:       next_state = ADDRESS;
-            ADDRESS:    next_state = (jump >= 2)   ? REGISTRO    : INICIO;
+            ADDRESS:    next_state = (jump >= 2)   ? REGISTRO    : LSFR;
             REGISTRO:   next_state = ALU;
-            ALU:        next_state = TIEMPO;
-            TIEMPO:     next_state = (count >= 20) ? ESPERA  : ALU;
+            ALU:        next_state = (btn0 || btn1 || btn2 || btn3) ? TIEMPO: ALU;
+            TIEMPO:     next_state = (count >= 10) ? JUMP  : ALU;
             JUMP:       next_state = (jump >= 2)   ? ESPERA  : ALU;
             ESPERA:     next_state = ALMACEN;
-            ALMACEN:    next_state = LECTURA;
+            ALMACEN:    next_state = DISPLAY;
             DISPLAY:    next_state = (count >= 20) ? RETORNO : DISPLAY;
-            RETORNO:    next_state = (max >= 10)   ? INICIO  : RETORNO;
+            RETORNO:    next_state = (max >= 10)   ? RETORNO : INICIO;
             //2°Modo
             DIRECCION:  next_state = LECTURA;
             LECTURA:    next_state = (count >= 20) ? SUMA    : LECTURA;
@@ -100,20 +106,23 @@ always_comb begin
         case (state)
         //1°Modo
             INICIO:begin      
-                        led = 4'b0000;
+                        led = 4'b0000; //0
                         seg = 16'h0000;
                         mux = 0;
                         we = 0;
                         op = 4'h0;
-                        addr = addr;
+                        addr = 0;
                         jump = jump;
                         count = count;
-                        max = max;
+                        max = 0;
                         end
             LSFR:begin
                         led = 4'b0001;
+                        we = 0;
+                         //1
+//                        en = 1;
 //                        seg = 16'h0000;
-                        mux = 0;
+//                        mux = 0;
 //                        we = 1;
 //                        op = 4'h0;
 //                        addr = addr; 
@@ -121,35 +130,37 @@ always_comb begin
 //                        count = count;
 //                        max = max;
                         end
-            ADDRESS:begin
-                        led = 4'b0010;
+            ADDRESS:begin 
+                        led = 4'b0010;//2
 //                        seg = 16'h0000;
 //                        mux = 0;
                         we = 1;
+//                        en = 0;
 //                        op = 4'h0;
                         addr = addr + 1;
                         jump = jump + 1 ;
 //                        count = count; 
                         end                 
-            REGISTRO:begin    
-                        led = 4'b0011;
+            REGISTRO:begin   
+                        led = 4'b0011;//3 
 //                        seg = 16'h0000;
 //                        mux =  1;
-                        we = 1;
+                        we = 0;
 //                        op = 4'h0;
-                        addr = addr - 2;
+                        addr = addr + 1;//2;
                         jump = jump - 2;
 //                        count = count;
 //                        max = max;
                         end
-            ALU:begin
-            mux=1;         
+            ALU:begin //4
+            mux = 1; 
+            we = 1;        
+            addr_rs1 = addr - 2;
+            addr_rs2 = addr - 1;
                         if (btn0) begin
                             op = 4'h2;
                             led  = 4'b1001;
 //                            seg = 16'h0000;
-//                            mux =  1;
-//                            we = 1;
 //                            addr = addr;
 //                            jump = jump;
 //                            count = count;
@@ -159,8 +170,6 @@ always_comb begin
                             op = 4'h6;
                             led  = 4'b0110;
 //                            seg = 16'h0000;
-//                            mux =  1;
-//                            we = 1;
 //                            addr = addr;
 //                            jump = jump;
 //                            count = count;
@@ -170,8 +179,6 @@ always_comb begin
                             op = 4'h0;
                             led  = 4'b1111;
 //                            seg = 16'h0000;
-//                            mux =  1;
-//                            we = 1;
 //                            addr = addr;
 //                            jump = jump;
 //                            count = count;
@@ -190,21 +197,22 @@ always_comb begin
                             end
                         end
             TIEMPO:begin 
-                        led = 4'b0101;
+                        led = 4'b0101;//5
+                        we=0;
 //                        seg = 16'h0000;
 //                        mux =  0;
-                        we = 1;
+//                        we = 0;
 //                        op = 4'b0000;
-                        count = count + 10;
+                        count = count + 20;
 //                        jump = jump;
 //                        addr = addr;
 //                        max = max;
                         end
             JUMP:begin 
-                        led = 4'b0110;
-//                        seg = 16'h0000;
+                        led = 4'b0110;//6
+                        seg = 16'h0000;
 //                        mux =  0;
-                        we = 1;
+//                        we =0;
 //                        op = 4'b0000;
 //                        count = count;
                         jump = jump + 1;
@@ -212,30 +220,30 @@ always_comb begin
 //                        max = max;
                         end
             ESPERA:begin      
-                        led = 4'b0111;
+                        led = 4'b0111;//7
 //                        seg = 16'h0000;
                         mux = 1;
-//                        we = 1;
+                        we = 1;
 //                        op = 4'b0000;
-//                        addr = addr;
-                        jump = jump -2;
+//                        addr = addr + 1;
+                        jump = jump -1;
                         count = count - 20;
                         //result = result;
 //                        max = max;
                         end
             ALMACEN:begin
-                        led = 4'b1000;
+                        led = 4'b1000;//8
                         seg = 16'h1111;
-                        mux =  1;
+//                        mux =  1;
 //                        we = 1;
 //                        op = 4'b0000;
-                        addr = addr + 1;
+//                        addr = addr ;
 //                        jump = jump;
 //                        count = count;
 //                        max = max;
                         end
             DISPLAY:begin 
-                        led = 4'b1001;
+                        led = 4'b1001;//9
                         seg = 16'h1111;
 //                        mux =  1;
 //                        we = 1;
@@ -245,13 +253,13 @@ always_comb begin
                         count = count + 10;
 //                        max = max;
                         end
-            RETORNO:begin    
+            RETORNO:begin    //10
                         led = 4'b1010;
 //                        seg = 16'h0000;
 //                        mux =  1;
 //                        we = 1;
 //                        op = 4'b0000;
-                        addr = addr + 1;
+//                        addr = addr + 1;
 //                        jump = jump;
 //                        count = count;
                         max = max + 1;
@@ -263,10 +271,10 @@ always_comb begin
                         mux =  0;
                         we = 1;
 //                        op = 4'b0000;
-//                        addr = addr;
+                        addr = 0;
 //                        jump = jump;
-//                        count = count;
-//                        max = max;
+                        count = 0;
+                        max = 0;
                         end
             LECTURA:begin
                         led = 4'b1111;
@@ -275,7 +283,7 @@ always_comb begin
                         we = 1;
 //                        op = 4'h0;
                         addr = addr;
-                        jump = jump;
+//                        jump = jump;
                         count = count + 10;
                         max = max;
                         end
@@ -284,9 +292,9 @@ always_comb begin
                         seg = 16'h0000;
 //                        mux =  1;
                         we = 1;
-                        op = 4'h0;
-                        addr = addr + 1;
-                        jump = jump;
+//                        op = 4'h0;
+//                        addr = addr + 1;
+//                        jump = jump;
                         count = count;
                         max = max + 1;
                         end

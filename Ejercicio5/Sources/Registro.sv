@@ -46,14 +46,14 @@ always @(posedge clk)begin
             Registro[i] <= 0;
         end
     else begin
-        if(we && addr_rd !=0)
+        if(we && (addr_rd != 0))
             Registro[addr_rd] <= data_in;
         end
 end
 
 always_comb begin
-    rs1 = (addr_rs1 == 0) ? 0 : Registro[addr_rs1];
-    rs2 = (addr_rs2 == 0) ? 0 : Registro[addr_rs2];
+    rs1 = (we != 0) ? 0 : Registro[addr_rs1];
+    rs2 = (we != 0) ? 0 : Registro[addr_rs2];
 end
 
 endmodule
