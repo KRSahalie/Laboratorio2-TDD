@@ -1,20 +1,15 @@
 
 ## 1. Abreviaturas y definiciones
 - **FPGA**: Field Programmable Gate Arrays
-- **FA**: Full Adder
-- **RCA**: Ripple Carry Adder
-- **CLA**: Carry Look-ahead Adder
 
 ## 2. Referencias
 [0] David Harris y Sarah Harris. *Digital Design and Computer Architecture. RISC-V Edition.* Morgan Kaufmann, 2022. ISBN: 978-0-12-820064-3
 
 [1] Features, 1., & Description, 3. (s/f). SNx4HC14 Hex Inverters with Schmitt-Trigger Inputs. Www.ti.com. https://www.ti.com/lit/ds/symlink/sn74hc14.pdf?ts=1709130609427&ref_url=https%253A%252F%252Fwww.google.com%252F
 
-
-
 ## 3. Desarrollo
 
-### 3.1 Ejercicio 1- Uso del PLL IP-core
+## 3.1 Ejercicio 1. Uso del PLL IP-core
 Descipción del módulo.
 #### 1. Módulo
 ```SystemVerilog
@@ -123,7 +118,7 @@ end
 endmodule
 ```
 
-# Ejercicio 2: Diseño antirebotes y sincronizador
+## Ejercicio 2: Diseño antirebotes y sincronizador
 Para el diseño del antirebotres y sincronizador se procedio a crear un module debouncer mediante la yutilizacion de dos flip flop para eliminar los pulsos mo deseados, tambien se utilizo un contador para llevar la cuenta en de los cambion en el falco positivo de la senal habilitadora.
 
 Se desea crear el programar el siguiente esquematico y a partir de este se cran los siguientes modulos para implementarlos en la FPGA.
@@ -136,7 +131,7 @@ Se desea crear el programar el siguiente esquematico y a partir de este se cran 
 #### 1. Encabezados de los  módulos
 Se implementa una funcion Top para mostrar la salida de lka tarjeta mediante la utilizacion de los leds, tambien inicializa el reloj
 Encabezado del modulo
-```
+```SystemVerilog
 module top_module_debouncer(
     input     logic             clk,
     input     logic             bt1_i,
@@ -151,7 +146,7 @@ module top_module_debouncer(
 
 Se crea un module_deboncer donse se realiza la conecxion de los flip flop para el sistema antirebote
 
-```
+```SystemVerilog
 module modules_debouncer(
     input     logic    clk,
     input     logic    bt1_i,
@@ -200,7 +195,7 @@ endmodule
 ```
 Tambien sde crea el module_contador_prueba el cual se impolementa para la llevar la cuenta en los cambios de la senal habilitadora.
 Encabezado del modulo
-```
+```SystemVerilog
 module module_contador_prueba(
     input logic         clk, 
     input logic         rst_n_i, 
@@ -220,7 +215,7 @@ Agregar en este formato.
 #### 4. Testbench
 Por Ultimo se implemento una testbench para poder realizar la simulacion de lo planteadop anteriormente
 
-```
+```SystemVerilog
 module tb_modules_debouncer;
     logic           clk;
     logic           bt1_i;
@@ -242,7 +237,7 @@ como resultado al implementar el testbenh obtuvimos lo siguiente
   <img src="https://raw.githubusercontent.com/KRSahalie/Laboratorio2-TDD/main/Imagenes/mi_ca/resultadoTB.png">
 </div>
 
-# Ejercicio 3: Decodificador hex-to-7-segments
+## Ejercicio 3: Decodificador hex-to-7-segments
 
 La solución al ejercicio 3 consiste en el uso de un decodificador binario a hexadecimal y su conversión a la visualización equivalente en siete segmentos (creado en el Laboratorio 1), pero que en lugar de utilizar switches para mapear datos, utiliza datos pseudoaleatorios. Esta implementación se realiza mediante la integración de cuatro Registros de Desplazamiento de Retroalimentación Lineal (LFSR) de 4 bits, concatenados en una unidad de entrada paralela-paralela (PIPO) de 16 bits. El objetivo principal es convertir secuencias binarias generadas por los LFSR en su representación hexadecimal y, a su vez, visualizar estas cifras en dispositivos de siete segmentos. 
 
@@ -1062,117 +1057,172 @@ El ejercicio fue diseñado e implementado con éxito, y todas las funcionalidade
 
 
 
-# Ejercicio 4. Banco de registros
+## Ejercicio 4: Banco de registros
 
-Agregar lo que amerite.
-#### 1.Código final Bit Adder
+## 1. Módulo de Registro
 
+El módulo...... 
 
+### 1. Encabezado
+```SystemVerilog
+// Banco de registros parametrizable
+module Registro #(
+    parameter N = 5,           // N bits de dirección => 2^N registros
+    parameter W = 8            // W bits de ancho por registro
+)(
+    input logic           clk,             // reloj
+    input logic           rst,             // reset síncrono
+    input logic [N-1:0]   addr_rs1,        // dirección de lectura 1
+    input logic [N-1:0]   addr_rs2,        // dirección de lectura 2
+    input logic [N-1:0]   addr_rd,         // dirección de escritura
+    input logic [W-1:0]   data_in,         // datos de entrada a escribir
+    input logic           we,              // write enable
 
-#### 2. Código final del RCA
-#### 3. Código final del LCA
-#### 4. Criterios de diseño
-#### 5. Testbench
-
+    output logic [W-1:0]  rs1,             // salida de lectura 1
+    output logic [W-1:0]  rs2              // salida de lectura 2
+);
 ```
-`timescale 1ns / 1ps
-//////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
-// Create Date: 17.04.2025 18:04:57
-// Design Name: 
-// Module Name: Registro_tb
-// Project Name: 
-// Target Devices: 
-// Tool Versions: 
-// Description: 
-// 
-// Dependencies: 
-// 
-// Revision:
-// Revision 0.01 - File Created
-// Additional Comments:
-// 
-//////////////////////////////////////////////////////////////////////////////////
+
+### 2. Señales
+Las señales básicas del módulo y su funcionamiento son:
+
+#### Señales de Entrada:
+- **clk:** Señal de reloj que controla el funcionamiento del banco de registros.
+- **rst:** Señal de reset que restablece el estado del banco de registros.
+- **addr_rs1,addr_rs2:** Direcciones de lectura del banco de registros.
+- **addr_rd:** Dirección de escritura del banco de registros.
+- **data_in:** Datos de entrada a escribir en el banco de registros.
+- **we:** Señal de write enable, controla la escritura en el banco de registros. 
+
+#### Señales de Salida:
+- **rs1,rs2:** Señales de salida de lectura del banco de registros. 
+
+### 3. Uso y criterios de diseño
 
 
+
+### 4. Testbench
+
+Este testbench verifica el funcionamiento del módulo de registro, provee entradas que son escritas a direcciones especificas y luego leídas para verificar que el paso de información es correcto. 
+
+```SystemVerilog
+// Definición de la escala de tiempo (1ns de unidad de tiempo, 1ps de precisión)
+`timescale 1ns/1ps
+
+// Módulo de prueba para el banco de registros (Registro_tb)
 module Registro_tb;
 
-parameter N = 6;
-parameter W = 8;
+    // Parámetros del banco de registros
+    parameter N = 5; // 2^5 = 32 registros (el número total de registros)
+    parameter W = 8; // 8 bits de ancho de cada registro (tamaño de los datos)
 
-logic          clk;
-logic          rst;
-logic [N-1:0]  addr_rs1;
-logic [N-1:0]  addr_rs2;
-logic [N-1:0]  addr_rd;
-logic [W-1:0]  data_in;
-logic          we;
+    // Señales de entrada y salida para el DUT (Device Under Test)
+    logic clk;  // Reloj
+    logic rst;  // Reset (reinicio)
+    logic [N-1:0] addr_rs1, addr_rs2, addr_rd;  // Direcciones de los registros
+    logic [W-1:0] data_in;  // Datos a escribir en el registro
+    logic we;  // Señal de habilitación de escritura (write enable)
+    logic [W-1:0] rs1, rs2;  // Salidas de los registros
 
-logic [W-1:0]  rs1;
-logic [W-1:0]  rs2;
+    // Instanciación del banco de registros (DUT)
+    Registro #(N, W) dut (
+        .clk(clk),        // Reloj
+        .rst(rst),        // Reset
+        .addr_rs1(addr_rs1), // Dirección del registro 1
+        .addr_rs2(addr_rs2), // Dirección del registro 2
+        .addr_rd(addr_rd),   // Dirección del registro de escritura
+        .data_in(data_in),   // Datos a escribir
+        .we(we),            // Habilitación de escritura
+        .rs1(rs1),          // Salida del registro 1
+        .rs2(rs2)           // Salida del registro 2
+    );
 
-Registro regX(
-.clk        (clk),
-.rst        (rst),
-.addr_rs1   (addr_rs1),
-.addr_rs2   (addr_rs2),
-.addr_rd    (addr_rd),
-.data_in    (data_in),
-.we         (we),
+    // Generador de señal de reloj (flip-flop que invierte el valor del reloj cada 5 unidades de tiempo)
+    always #5 clk = ~clk;
 
-.rs1         (rs1),
-.rs2         (rs2)
-);
+    // Memoria de referencia para comparar los valores escritos
+    logic [W-1:0] ref_mem [0:(2**N)-1];
 
-    
-initial clk = 0;
-always #5 clk = ~clk;
+    initial begin
+        integer i;  // Variable de índice para los bucles
 
-initial begin
-$dumpfile("Registro_tb.vcd");
-$dumpvars(0, Registro_tb);
+        // Inicialización de señales
+        clk = 0;  // El reloj inicia en 0
+        rst = 1;  // El reset está activado inicialmente
+        we = 0;   // No se habilita la escritura al principio
+        data_in = 0;  // Inicialización de los datos de entrada
+        addr_rd = 0;  // Dirección de lectura inicial
+        addr_rs1 = 0; // Dirección de lectura para rs1
+        addr_rs2 = 0; // Dirección de lectura para rs2
 
-rst = 1;
-we  = 0;
-addr_rd = 0; 
-data_in = 0;
-        
-#10 
+        // Activación del reset durante 10 unidades de tiempo
+        #10 rst = 0;
 
-rst = 0;
-we  = 1;
-addr_rd = 1; 
-data_in = 8'h45;
+        // Escritura de datos aleatorios en los registros (excepto en el registro 0)
+        for (i = 1; i < 2**N; i = i + 1) begin
+            @(posedge clk); // Espera un ciclo de reloj
+            addr_rd = i;  // Se asigna la dirección del registro
+            data_in = $urandom_range(0, 2**W - 1);  // Generación de datos aleatorios
+            ref_mem[i] = data_in;  // Se almacena el valor en la memoria de referencia
+            we = 1;  // Se habilita la escritura
+        end
 
-#10
+        @(posedge clk);  // Espera otro ciclo de reloj
+        we = 0;  // Se deshabilita la escritura
+        addr_rd = 0;  // Se restablece la dirección de lectura a 0
 
-addr_rd = 2; 
-data_in = 8'h1a;
+        // Lectura de registros aleatorios
+        for (i = 0; i < 10; i = i + 1) begin
+            @(posedge clk);  // Espera un ciclo de reloj
+            addr_rs1 = $urandom_range(0, 2**N - 1);  // Se asigna aleatoriamente la dirección de lectura para rs1
+            addr_rs2 = $urandom_range(0, 2**N - 1);  // Se asigna aleatoriamente la dirección de lectura para rs2
+            #1; // Se introduce un pequeño retraso para observar los valores leídos
 
-#10
+            // Impresión de los resultados de lectura con comparación
+            $display("--------------------------------------------------");
+            $display("Read Check #%0d", i + 1);  // Muestra el número de la prueba
 
-we = 0;
-addr_rs1 = 1;
-addr_rs2 = 2;
+            // Verificación del valor leído en rs1
+            $display("  RS1 -> Address: %0d | Value: %0d | Expected: %0d", 
+                     addr_rs1, rs1, (addr_rs1 == 0) ? 0 : ref_mem[addr_rs1]);  // Dirección, valor leído y valor esperado
+            if (rs1 == ((addr_rs1 == 0) ? 0 : ref_mem[addr_rs1])) 
+                $display("    => RS1 Check PASSED!");  // Si coincide, se muestra que la verificación fue exitosa
+            else 
+                $display("    => RS1 Check FAILED!");  // Si no coincide, se muestra que falló
 
-#15
+            // Verificación del valor leído en rs2
+            $display("  RS2 -> Address: %0d | Value: %0d | Expected: %0d", 
+                     addr_rs2, rs2, (addr_rs2 == 0) ? 0 : ref_mem[addr_rs2]);  // Dirección, valor leído y valor esperado
+            if (rs2 == ((addr_rs2 == 0) ? 0 : ref_mem[addr_rs2])) 
+                $display("    => RS2 Check PASSED!");  // Si coincide, se muestra que la verificación fue exitosa
+            else 
+                $display("    => RS2 Check FAILED!");  // Si no coincide, se muestra que falló
 
-addr_rs1 = 0;
-#10
+            $display("--------------------------------------------------\n");  // Se separan las verificaciones con una línea
+        end
 
-$finish;
-end
+        $display("Testbench terminado.");  // Mensaje final indicando que la prueba ha terminado
+        $finish;  // Finaliza la simulación
+    end
+
 endmodule
 ```
+La simulación se puede ver en la imagen siguiente: 
 
-# 3.5 Ejercicio 5. Mini unidad de cálculo
-## 1. Diagrama de bloques para la mini unidad de claculo
+<div align="center">
+  <img src="X">
+</div>
+
+Los valores obtenidos son correctos y esperados, se comprueba la generación de datos con este paso. 
+
+
+
+## 3.5 Ejercicio 5. Mini unidad de cálculo
+### 1. Diagrama de bloques para la mini unidad de claculo
  <div align="center">
 <img src="https://raw.githubusercontent.com/KRSahalie/Laboratorio2-TDD/main/Ejercicio5/Imagenes/Diagrama_Bloques.png">
 </div>
-## 2.1 Diagramas de de flujo para la mini unidad de calculo 
+### 2.1 Diagramas de de flujo para la mini unidad de calculo 
 ### 2.1 Modo 1
  <div align="center">
 <img src="https://raw.githubusercontent.com/KRSahalie/Laboratorio2-TDD/main/Ejercicio5/Imagenes/Diagrama taller.drawio.png">
@@ -1182,16 +1232,16 @@ endmodule
 <img src="https://raw.githubusercontent.com/KRSahalie/Laboratorio2-TDD/main/Ejercicio5/Imagenes/Diagrama_Flujo_M2.png">
 </div>
 
-## 3. La maquina de estados seleccionada fue la de moore que se encuentra en la siguiente imagen.
+### 3. La maquina de estados seleccionada fue la de moore que se encuentra en la siguiente imagen.
 <div align="center">
 <img src="https://raw.githubusercontent.com/KRSahalie/Laboratorio2-TDD/main/Ejercicio5/Imagenes/FSM">
 </div>
 
-## 4. Ruta de datos
+### 4. Ruta de datos
 Para el sistema primero se generan 2 grupo de bits semialeatorios (LSFR), uno a la vez pasando por el mux donde la maquina de estados permite la salida de la entrada del LSFR guardando en la dirección 1 a los primeros 7 bits semialeatorios y luego volviendo a realizar el proceso para los segundos 7bits semialeatorios. Ya guardados en el banco de registros en la posición 1 y 2 se manda los valores del registro a la ALU al mismo tiempo que se manda cada uno de los 2 numeros semialatorios a la pa
 
-## 5. Codigo
-```
+### 5. Codigo
+```SystemVerilog
 module FSM(
 input logic clk,
 input logic rst,
@@ -1466,7 +1516,7 @@ end
 endmodule
 ```
 ## 6 Top module
-```
+```SystemVerilog
 module FSM_top(
 input logic clk,
 input logic rst,
@@ -1545,7 +1595,7 @@ endmodule
 ```
 ## 7 Testbench
 
-```
+```SystemVerilog
 module FSM_tb;
     // Señales de entrada
     logic        clk;
