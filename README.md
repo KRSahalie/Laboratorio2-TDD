@@ -1060,8 +1060,7 @@ El ejercicio fue diseñado e implementado con éxito, y todas las funcionalidade
 ## Ejercicio 4: Banco de registros
 
 ## 1. Módulo de Registro
-
-El módulo...... 
+El módulo Registro implementa un banco de registros de 32 registros (configurable mediante el parámetro N) con un ancho de datos de 8 bits (configurable mediante el parámetro W). Este módulo permite realizar lecturas y escrituras de manera controlada en cada uno de los registros, utilizando señales de dirección para seleccionar el registro de lectura y escritura, así como un bit de habilitación de escritura (we). Además, se incluye un mecanismo de reset para asegurar que el banco de registros inicie en un estado conocido. El banco de registros se utiliza comúnmente en unidades de procesamiento o sistemas que requieren almacenamiento temporal de datos en hardware digital.
 
 ### 1. Encabezado
 ```SystemVerilog
@@ -1098,8 +1097,11 @@ Las señales básicas del módulo y su funcionamiento son:
 - **rs1,rs2:** Señales de salida de lectura del banco de registros. 
 
 ### 3. Uso y criterios de diseño
+El banco de registros desarrollado en este laboratorio es una estructura parametrizable que permite almacenar temporalmente variables necesarias para la ejecución de las instrucciones de un procesador. Este banco cuenta con un número configurable de registros, 2^N en total, y cada registro tiene un ancho de W bits, lo que proporciona flexibilidad en términos de almacenamiento y acceso. El banco de registros está diseñado para realizar escritura de datos en cualquier registro especificado a través de la dirección addr_rd, pero la escritura solo ocurre cuando la señal de habilitación we está activa. Las lecturas de los registros se realizan mediante las señales de dirección addr_rs1 y addr_rs2, que seleccionan qué registros devolverán sus valores a través de las salidas rs1 y rs2, respectivamente.
 
+Es importante destacar que el registro ubicado en la dirección 0x00h es de solo lectura, y siempre devuelve un valor de 0x0000000h al ser leído, independientemente de la operación de lectura realizada. Este comportamiento asegura que el registro 0 no sea modificado durante la ejecución del sistema.
 
+Este diseño también incorpora la capacidad de probar el banco de registros a través de un testbench, que permite escribir valores aleatorios en cada registro y luego realizar lecturas también aleatorias para verificar la correcta operación de la memoria. El sistema se ha diseñado para que sea fácilmente adaptable a diferentes anchos de palabra, como 8 bits o 16 bits, y puede ser implementado en una FPGA para su demostración práctica.
 
 ### 4. Testbench
 
@@ -1210,10 +1212,94 @@ endmodule
 La simulación se puede ver en la imagen siguiente: 
 
 <div align="center">
-  <img src="X">
+  <img src="https://github.com/KRSahalie/Laboratorio2-TDD/blob/main/Ejercicio4/Imagenes/Tb.png">
 </div>
 
+Además se muentra en la consola unos mensajes de autoverificación:
+
+```SystemVerilog
+--------------------------------------------------
+Read Check #1
+  RS1 -> Address: 26 | Value: 140 | Expected: 140
+    => RS1 Check PASSED!
+  RS2 -> Address: 6 | Value: 244 | Expected: 244
+    => RS2 Check PASSED!
+--------------------------------------------------
+
+--------------------------------------------------
+Read Check #2
+  RS1 -> Address: 14 | Value: 214 | Expected: 214
+    => RS1 Check PASSED!
+  RS2 -> Address: 29 | Value: 209 | Expected: 209
+    => RS2 Check PASSED!
+--------------------------------------------------
+
+--------------------------------------------------
+Read Check #3
+  RS1 -> Address: 23 | Value: 198 | Expected: 198
+    => RS1 Check PASSED!
+  RS2 -> Address: 8 | Value: 101 | Expected: 101
+    => RS2 Check PASSED!
+--------------------------------------------------
+
+--------------------------------------------------
+Read Check #4
+  RS1 -> Address: 23 | Value: 198 | Expected: 198
+    => RS1 Check PASSED!
+  RS2 -> Address: 18 | Value: 195 | Expected: 195
+    => RS2 Check PASSED!
+--------------------------------------------------
+
+--------------------------------------------------
+Read Check #5
+  RS1 -> Address: 14 | Value: 214 | Expected: 214
+    => RS1 Check PASSED!
+  RS2 -> Address: 5 | Value: 140 | Expected: 140
+    => RS2 Check PASSED!
+--------------------------------------------------
+
+--------------------------------------------------
+Read Check #6
+  RS1 -> Address: 15 | Value: 128 | Expected: 128
+    => RS1 Check PASSED!
+  RS2 -> Address: 5 | Value: 140 | Expected: 140
+    => RS2 Check PASSED!
+--------------------------------------------------
+
+--------------------------------------------------
+Read Check #7
+  RS1 -> Address: 13 | Value: 29 | Expected: 29
+    => RS1 Check PASSED!
+  RS2 -> Address: 6 | Value: 244 | Expected: 244
+    => RS2 Check PASSED!
+--------------------------------------------------
+
+--------------------------------------------------
+Read Check #8
+  RS1 -> Address: 23 | Value: 198 | Expected: 198
+    => RS1 Check PASSED!
+  RS2 -> Address: 27 | Value: 179 | Expected: 179
+    => RS2 Check PASSED!
+--------------------------------------------------
+
+--------------------------------------------------
+Read Check #9
+  RS1 -> Address: 12 | Value: 26 | Expected: 26
+    => RS1 Check PASSED!
+  RS2 -> Address: 6 | Value: 244 | Expected: 244
+    => RS2 Check PASSED!
+--------------------------------------------------
+
+--------------------------------------------------
+Read Check #10
+  RS1 -> Address: 1 | Value: 217 | Expected: 217
+    => RS1 Check PASSED!
+  RS2 -> Address: 25 | Value: 9 | Expected: 9
+    => RS2 Check PASSED!
+--------------------------------------------------
+```
 Los valores obtenidos son correctos y esperados, se comprueba la generación de datos con este paso. 
+
 
 
 
