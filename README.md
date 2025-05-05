@@ -10,7 +10,21 @@
 ## 3. Desarrollo
 
 ## 3.1 Ejercicio 1. Uso del PLL IP-core
-Descipción del módulo.
+Su función principal es distribuir y estabilizar señales de reloj en un diseño digital. Sus características clave:
+Entradas/Salidas:
+•	Entradas:
+-	clk_100MHz y clk_100MHz_1: Dos relojes de referencia de 100 MHz.
+-	reset_rtl_0: Reset activo (a nivel bajo).
+•	Salidas:
+-	clk_out1_0: Reloj generado (frecuencia determinada por el módulo interno clock_0).
+-	locked: Señal que indica estabilidad del reloj generado (1 = estable).
+Funcionamiento interno:
+-	Instancia el módulo clock_0_i, que probablemente contiene un PLL (Phase-Locked Loop) o MMCM (Mixed-Mode Clock Manager) para generar relojes con características específicas.
+-	La directiva timescale 1 ps / 1 ps define la unidad de tiempo para simulaciones.
+Aplicación típica:
+-	Proporcionar relojes sincronizados y estables para otros módulos en diseños FPGA.
+-	Gestionar domain crossing (cambios entre dominios de reloj).
+
 #### 1. Módulo
 ```SystemVerilog
 `timescale 1 ps / 1 ps
