@@ -61,22 +61,26 @@ endmodule
 ```
 #### 2. Criterios y restricciones de diseño
 Diseño sincrónico robusto:
+
 •	Usar un único flanco de reloj (ascendente o descendente) en todo el sistema para evitar inconsistencias temporales.
 •	Registrar las salidas de cada módulo para garantizar estabilidad.
 •	Sincronizar señales asincrónicas externas con circuitos de metaestabilidad.
+
 Gestión de relojes:
+
 •	Emplear bloques dedicados (MMCM/PLL) para distribución con baja distorsión y alta capacidad de fan-out.
 •	Definir restricciones de periodo para cada reloj, cubriendo solo caminos entre elementos sincrónicos controlados por ese reloj.
 •	Evitar divisores de reloj basados en lógica combinacional para prevenir desfases.
+
 Restricciones temporales críticas:
+
 •	Periodo mínimo: Calculado como Tcycle>TCO+Twd1+Tpd+Twd2+TSU+TmTcycle>TCO+Twd1+Tpd+Twd2+TSU+Tm.
 •	Setup time (tsutsu): Tiempo mínimo de estabilidad de datos antes del flanco de reloj.
 •	Hold time (thth): Tiempo mínimo de estabilidad posterior al flanco.
+
 Regla 60/40:
+
 •	60% del periodo asignado a retardo lógico y 40% a retardo de rutado para garantizar margen de seguridad. Si el retardo lógico supera el 60%, se recomienda rediseñar el módulo afectado.
-Herramientas y verificación:
-•	Usar análisis STA (Static Timing Analysis) para identificar caminos no restringidos.
-•	Aplicar restricciones MAXDELAY en lógica combinacional crítica.
 
 #### 3. Testbench y Implementación en la FPGA
 ```SystemVerilog
