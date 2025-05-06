@@ -30,15 +30,30 @@ input logic btn2,
 input logic btn3,
 
 output logic [3:0]  led,
-output logic [15:0] seg,
+output logic [6:0]  seg,
 output logic        mux,
 output logic        we,
 output logic [3:0]  op,
-output logic [4:0]  addr_rs2,
 output logic [4:0]  addr,
+output logic [4:0]  addr_rs2,
+output logic [4:0]  addr_rs1,
+output logic [3:0]  an
 //output logic        en
     );
-    
+
+//logic [7:0] data; 
+//logic [6:0] sym; 
+//logic [3:0] an;
+ 
+//Deco decof(
+//.clk_i (clk), //Reloj global - Switch a decision
+//.rst_i (rst), //Reset global - Switch a decision
+//.data    (data), 
+
+//.seg   (segm), //salida a los segmentos
+//.an    (an)// salida a los anodos
+//);
+
 typedef enum logic [3:0]{
 INICIO    = 4'd0,
 LSFR      = 4'd1,
@@ -70,7 +85,11 @@ always @(negedge clk)begin
          jump     <= 0;
          max      <= 0;
          addr     <= 0;
-  end else begin
+         addr_rs2 <= 0;
+         addr_rs1 <= 0;
+//         segm     <= 0;
+         end 
+    else begin
         state    <= next_state;
 //        count    <= next_count;
 //        jump     <= next_jump;
@@ -89,15 +108,15 @@ always_comb begin
             ADDRESS:    next_state = (jump >= 2)   ? REGISTRO    : LSFR;
             REGISTRO:   next_state = ALU;
             ALU:        next_state = (btn0 || btn1 || btn2 || btn3) ? TIEMPO: ALU;
-            TIEMPO:     next_state = (count >= 10) ? JUMP  : ALU;
-            JUMP:       next_state = (jump >= 2)   ? ESPERA  : ALU;
-            ESPERA:     next_state = ALMACEN;
+            TIEMPO:     next_state = JUMP;
+            JUMP:       next_state = (count >= 10) ? ESPERA : TIEMPO;
+            ESPERA:     next_state = (jump >= 2)   ? ALMACEN : TIEMPO;
             ALMACEN:    next_state = DISPLAY;
-            DISPLAY:    next_state = (count >= 20) ? RETORNO : DISPLAY;
+            DISPLAY:    next_state = (count >= 10) ? RETORNO : DISPLAY;
             RETORNO:    next_state = (max >= 10)   ? RETORNO : INICIO;
             //2°Modo
             DIRECCION:  next_state = LECTURA;
-            LECTURA:    next_state = (count >= 20) ? SUMA    : LECTURA;
+            LECTURA:    next_state = (count >= 10) ? SUMA    : LECTURA;
             SUMA:       next_state = (max >= 32 )  ? INICIO  : LECTURA;
         endcase
 end
@@ -107,35 +126,23 @@ always_comb begin
         //1°Modo
             INICIO:begin      
                         led = 4'b0000; //0
-                        seg = 16'h0000;
+//                        segm = segm;
                         mux = 0;
                         we = 0;
                         op = 4'h0;
-                        addr = 0;
-                        jump = jump;
+                        addr = addr;
+                        jump = 0;
                         count = count;
-                        max = 0;
+                        max = max;
                         end
             LSFR:begin
                         led = 4'b0001;
                         we = 0;
-                         //1
-//                        en = 1;
-//                        seg = 16'h0000;
-//                        mux = 0;
-//                        we = 1;
-//                        op = 4'h0;
-//                        addr = addr; 
-//                        jump = jump;
-//                        count = count;
-//                        max = max;
                         end
             ADDRESS:begin 
                         led = 4'b0010;//2
-//                        seg = 16'h0000;
 //                        mux = 0;
                         we = 1;
-//                        en = 0;
 //                        op = 4'h0;
                         addr = addr + 1;
                         jump = jump + 1 ;
@@ -154,99 +161,75 @@ always_comb begin
                         end
             ALU:begin //4
             mux = 1; 
-            we = 1;        
+//            we = 1;        
             addr_rs1 = addr - 2;
             addr_rs2 = addr - 1;
                         if (btn0) begin
                             op = 4'h2;
-                            led  = 4'b1001;
-//                            seg = 16'h0000;
-//                            addr = addr;
-//                            jump = jump;
-//                            count = count;
-//                            max = max;
+                            led  = 4'b0010;
                             end
                         else if (btn1) begin
                             op = 4'h6;
                             led  = 4'b0110;
-//                            seg = 16'h0000;
-//                            addr = addr;
-//                            jump = jump;
-//                            count = count;
-//                            max = max;
                             end
                         else if (btn2) begin
                             op = 4'h0;
                             led  = 4'b1111;
-//                            seg = 16'h0000;
-//                            addr = addr;
-//                            jump = jump;
-//                            count = count;
-//                            max = max;
                             end
                         else if (btn3) begin
                             op = 4'h1;
-                            led  = 4'b1010;
-//                            seg = 16'h0000;
-//                            mux =  1;
-//                            we = 1;
-//                            addr = addr;
-//                            jump = jump;
-//                            count = count;
-//                            max = max;
+                            led  = 4'b0001;
                             end
                         end
             TIEMPO:begin 
                         led = 4'b0101;//5
-                        we=0;
+//                        we = 0;
 //                        seg = 16'h0000;
 //                        mux =  0;
 //                        we = 0;
-//                        op = 4'b0000;
-                        count = count + 20;
+                        count = count + 10;
 //                        jump = jump;
 //                        addr = addr;
 //                        max = max;
                         end
             JUMP:begin 
                         led = 4'b0110;//6
-                        seg = 16'h0000;
+//                        segm = segm;
 //                        mux =  0;
 //                        we =0;
-//                        op = 4'b0000;
 //                        count = count;
-                        jump = jump + 1;
-                        addr = addr + 1;
+//                        jump = jump + 1;
+//                        addr = addr + 1;
 //                        max = max;
                         end
             ESPERA:begin      
                         led = 4'b0111;//7
 //                        seg = 16'h0000;
-                        mux = 1;
-                        we = 1;
+//                        mux = 1;
+//                        we = 1;
 //                        op = 4'b0000;
-//                        addr = addr + 1;
-                        jump = jump -1;
-                        count = count - 20;
+//                        addr = addr - 2;
+                        jump = jump + 1;
+//                        count = count - 20;
                         //result = result;
 //                        max = max;
                         end
             ALMACEN:begin
                         led = 4'b1000;//8
-                        seg = 16'h1111;
+//                        seg = 16'h1111;
 //                        mux =  1;
-//                        we = 1;
+                        we = 1;
 //                        op = 4'b0000;
-//                        addr = addr ;
+//                        addr = addr + 1 ;
 //                        jump = jump;
-//                        count = count;
+//                        count = count - 1;
 //                        max = max;
                         end
             DISPLAY:begin 
                         led = 4'b1001;//9
-                        seg = 16'h1111;
+//                        segm = segm;
 //                        mux =  1;
-//                        we = 1;
+                        we = 0;
 //                        op = 4'b0000;
 //                        addr = addr;
 //                        jump = jump;
@@ -278,7 +261,7 @@ always_comb begin
                         end
             LECTURA:begin
                         led = 4'b1111;
-                        seg = 16'h0000;
+//                        segm = segm;
                         mux =  0;
                         we = 1;
 //                        op = 4'h0;
@@ -289,7 +272,7 @@ always_comb begin
                         end
             SUMA:begin  
                         led = 4'b1001;
-                        seg = 16'h0000;
+//                        segm = segm;
 //                        mux =  1;
                         we = 1;
 //                        op = 4'h0;
