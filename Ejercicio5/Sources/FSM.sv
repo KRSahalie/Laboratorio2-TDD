@@ -78,7 +78,7 @@ logic [15:0] count;
 logic [3:0] max;
 
 //Definición del rst y valores iniciales
-always @(negedge clk)begin
+always @(posedge clk)begin
     if (rst) begin
          state    <= INICIO;
          count    <= 0;

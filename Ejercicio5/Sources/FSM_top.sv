@@ -30,7 +30,7 @@ input logic btn2,
 input logic btn3,
 
 output logic [3:0]  led,
-output logic [6:0] seg,
+output logic [6:0]  seg,
 output logic        mux,
 output logic        we,
 output logic [3:0]  op,
@@ -41,7 +41,6 @@ output logic [4:0]  addr_rs2
     );
     
 logic [6:0] A_reg;
-//logic [6:0] B_reg;
 logic [7:0] result;
 logic [6:0] out;
 logic [6:0] rs1;
@@ -68,23 +67,22 @@ FSM fsm_U(
 //.an
 );
 
-LFSR l_sfm(
-.clk   (clk),
-.rst   (rst),
-.A_reg (A_reg)
-);
-
 //LFSR l_sfm(
-//.i_Clk (clk),
-//.i_Rst (rst),
+//.clk   (clk),
+//.rst   (rst),
+//.A_reg (A_reg)
+//);
+
+LFSR l_sfm(
+.i_Clk (clk),
+.i_Rst (rst),
 //.i_Enable (en),
  
-   // Optional Seed Value
-//.i_Seed_Data(7'b1010101),
+.i_Seed_Data(7'b1010101),
  
-//.o_LFSR_Data (A_reg)
+.o_LFSR_Data (A_reg)
 //.o_LFSR_Done
-//);
+);
 
 mux4 mux_U(
 .in0 (A_reg), 
