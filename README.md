@@ -10,7 +10,25 @@
 ## 3. Desarrollo
 
 ## 3.1 Ejercicio 1. Uso del PLL IP-core
-Descipción del módulo.
+Su función principal es distribuir y estabilizar señales de reloj en un diseño digital. Sus características clave:
+Entradas/Salidas:
+
+Entradas:
+-	clk_100MHz y clk_100MHz_1: Dos relojes de referencia de 100 MHz.
+-	reset_rtl_0: Reset activo (a nivel bajo).
+
+Salidas:
+-	clk_out1_0: Reloj generado (frecuencia determinada por el módulo interno clock_0).
+-	locked: Señal que indica estabilidad del reloj generado (1 = estable).
+
+Funcionamiento interno:
+-	Instancia el módulo clock_0_i, que probablemente contiene un PLL (Phase-Locked Loop) o MMCM (Mixed-Mode Clock Manager) para generar relojes con características específicas.
+-	La directiva timescale 1 ps / 1 ps define la unidad de tiempo para simulaciones.
+
+Aplicación típica:
+-	Proporcionar relojes sincronizados y estables para otros módulos en diseños FPGA.
+-	Gestionar domain crossing (cambios entre dominios de reloj).
+
 #### 1. Módulo
 ```SystemVerilog
 `timescale 1 ps / 1 ps
@@ -42,6 +60,27 @@ module clock_0_wrapper
 endmodule
 ```
 #### 2. Criterios y restricciones de diseño
+Diseño sincrónico robusto:
+
+•	Usar un único flanco de reloj (ascendente o descendente) en todo el sistema para evitar inconsistencias temporales.
+•	Registrar las salidas de cada módulo para garantizar estabilidad.
+•	Sincronizar señales asincrónicas externas con circuitos de metaestabilidad.
+
+Gestión de relojes:
+
+•	Emplear bloques dedicados (MMCM/PLL) para distribución con baja distorsión y alta capacidad de fan-out.
+•	Definir restricciones de periodo para cada reloj, cubriendo solo caminos entre elementos sincrónicos controlados por ese reloj.
+•	Evitar divisores de reloj basados en lógica combinacional para prevenir desfases.
+
+Restricciones temporales críticas:
+
+•	Periodo mínimo: Calculado como Tcycle>TCO+Twd1+Tpd+Twd2+TSU+TmTcycle>TCO+Twd1+Tpd+Twd2+TSU+Tm.
+•	Setup time (tsutsu): Tiempo mínimo de estabilidad de datos antes del flanco de reloj.
+•	Hold time (thth): Tiempo mínimo de estabilidad posterior al flanco.
+
+Regla 60/40:
+
+•	60% del periodo asignado a retardo lógico y 40% a retardo de rutado para garantizar margen de seguridad. Si el retardo lógico supera el 60%, se recomienda rediseñar el módulo afectado.
 
 #### 3. Testbench y Implementación en la FPGA
 ```SystemVerilog
