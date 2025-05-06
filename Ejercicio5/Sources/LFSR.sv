@@ -30,7 +30,7 @@ always @(posedge clk)begin
     if (rst)
         A_reg <= 7'd0;
     else
-        A_reg <= $urandom % 128;
+        A_reg <= $urandom;
 end
 
 endmodule

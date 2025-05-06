@@ -36,8 +36,8 @@ output logic        we,
 output logic [3:0]  op,
 output logic [4:0]  addr,
 output logic [4:0]  addr_rs2,
-output logic [4:0]  addr_rs1,
-output logic [3:0]  an
+output logic [4:0]  addr_rs1
+//output logic [3:0]  an
 //output logic        en
     );
 
@@ -221,7 +221,6 @@ always_comb begin
                         we = 1;
 //                        op = 4'b0000;
 //                        addr = addr + 1 ;
-//                        jump = jump;
 //                        count = count - 1;
 //                        max = max;
                         end

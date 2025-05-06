@@ -30,21 +30,23 @@ input logic btn2,
 input logic btn3,
 
 output logic [3:0]  led,
-output logic [15:0] seg,
+output logic [6:0] seg,
 output logic        mux,
 output logic        we,
 output logic [3:0]  op,
 output logic [4:0]  addr,
-output logic        en
+output logic [4:0]  addr_rs1,
+output logic [4:0]  addr_rs2
+//output logic        en
     );
     
 logic [6:0] A_reg;
 //logic [6:0] B_reg;
-logic [6:0] result;
+logic [7:0] result;
 logic [6:0] out;
 logic [6:0] rs1;
 logic [6:0] rs2;
-logic [6:0] data_in;
+logic [7:0] data_in;
 
 FSM fsm_U(
 .clk  (clk),
@@ -60,14 +62,16 @@ FSM fsm_U(
 .mux  (mux),
 .we   (we),
 .op   (op),
-.addr (addr)
+.addr (addr),
+.addr_rs1 (addr_rs1),
+.addr_rs2 (addr_rs2)
+//.an
 );
 
-LFSR2 l_sfm(
+LFSR l_sfm(
 .clk   (clk),
 .rst   (rst),
 .A_reg (A_reg)
-//.B_reg (B_reg)
 );
 
 //LFSR l_sfm(
@@ -75,11 +79,11 @@ LFSR2 l_sfm(
 //.i_Rst (rst),
 //.i_Enable (en),
  
-//   // Optional Seed Value
-////.i_Seed_Data ,
+   // Optional Seed Value
+//.i_Seed_Data(7'b1010101),
  
 //.o_LFSR_Data (A_reg)
-////.o_LFSR_Done
+//.o_LFSR_Done
 //);
 
 mux4 mux_U(
@@ -92,8 +96,8 @@ mux4 mux_U(
 Registro reg_fsm (
 .clk(clk),
 .rst(rst),
-.addr_rs1(addr),
-.addr_rs2(addr+1),
+.addr_rs1r(addr_rs1),
+.addr_rs2r(addr_rs2),
 .addr_rd(addr),
 .data_in(data_in),
 .we(we),

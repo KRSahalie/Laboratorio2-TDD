@@ -26,17 +26,17 @@ parameter W = 7)
 (
 input logic          clk,
 input logic          rst,
-input logic [N-1:0]  addr_rs1,
-input logic [N-1:0]  addr_rs2,
+input logic [N-1:0]  addr_rs1r,
+input logic [N-1:0]  addr_rs2r,
 input logic [N-1:0]  addr_rd,
-input logic [W-1:0]  data_in,
+input logic [W:0]    data_in,
 input logic          we,
 
-output logic [W:0]    rs1,
-output logic [W:0]    rs2
+output logic [W-1:0]    rs1,
+output logic [W-1:0]    rs2
     );
 
-logic [W-1:0] Registro [0:2**N-1];
+logic [W:0] Registro [0:2**N-1];
 
 integer i;
 
@@ -52,8 +52,8 @@ always @(posedge clk)begin
 end
 
 always_comb begin
-    rs1 = (we != 0) ? 0 : Registro[addr_rs1];
-    rs2 = (we != 0) ? 0 : Registro[addr_rs2];
+    rs1 = (addr_rd != 0) ? Registro[addr_rs1r] : 0;
+    rs2 = (addr_rd != 0) ? Registro[addr_rs2r] : 0;
 end
 
 endmodule
