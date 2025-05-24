@@ -1,14 +1,14 @@
 `timescale 1ns / 1ps
 
 module Alu #(
-parameter N = 7)
+parameter N = 16)
 (
  input logic [N-1:0] A,
  input logic [N-1:0] B,
  input logic [3:0] Alu_control,
 // input logic       ALUFlagsIn, 
  
- output logic [N:0] result
+ output logic [N-1:0] result
 // output logic       ALUFlags
     ); 
  

@@ -1,12 +1,12 @@
 `timescale 1ns/1ps
 module mux4 #(
-parameter W = 7) 
+parameter W = 16) 
 (
 input  logic [W-1:0]  in0, 
-input  logic [W:0]    in1, 
+input  logic [W-1:0]    in1, 
 input  logic          sel,
     
-output logic [W:0]   out
+output logic [W-1:0]   out
 );
     always_comb begin
         case (sel)

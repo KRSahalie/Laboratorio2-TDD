@@ -22,21 +22,21 @@
 
 module Registro #(
 parameter N = 5,
-parameter W = 7)
+parameter W = 16)
 (
 input logic          clk,
 input logic          rst,
 input logic [N-1:0]  addr_rs1r,
 input logic [N-1:0]  addr_rs2r,
 input logic [N-1:0]  addr_rd,
-input logic [W:0]    data_in,
+input logic [W-1:0]  data_in,
 input logic          we,
 
 output logic [W-1:0]    rs1,
 output logic [W-1:0]    rs2
     );
 
-logic [W:0] Registro [0:2**N-1];
+logic [W-1:0] Registro [0:2**N-1];
 
 integer i;
 

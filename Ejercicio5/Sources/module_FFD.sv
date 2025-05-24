@@ -3,9 +3,9 @@
 // Company: 
 // Engineer: 
 // 
-// Create Date: 25.03.2025 14:28:22
+// Create Date: 13.04.2025 21:16:40
 // Design Name: 
-// Module Name: LFSR
+// Module Name: module_FFD
 // Project Name: 
 // Target Devices: 
 // Tool Versions: 
@@ -20,17 +20,15 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module LFSR(
-input logic  clk,
-input logic  rst,
-output logic [6:0] A_reg
+module module_FFD(
+    input     logic    clk, // Data Input
+    input     logic    D, // Clock Input
+    input     logic    EN,
+    output    logic    Q       // Q output
     );
 
-always @(posedge clk)begin
-    if (rst)
-        A_reg <= 7'd0;
-    else
-        A_reg <= $urandom;
-end
-
+    always_ff @ ( posedge clk) begin
+        if (EN)  Q <= D;
+       end
+   
 endmodule
