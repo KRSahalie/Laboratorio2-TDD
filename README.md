@@ -1814,3 +1814,12 @@ $finish;
 end
 endmodule
 ```
+## 8 Testbench
+
+<div align="center">
+<img src="https://raw.githubusercontent.com/KRSahalie/Laboratorio2-TDD/main/Ejercicio5/Imagenes/Simulación.png">
+</div>
+
+<div align="center">
+<img src="https://raw.githubusercontent.com/KRSahalie/Laboratorio2-TDD/main/Ejercicio5/Imagenes/Simulación 2.png">
+</div>
